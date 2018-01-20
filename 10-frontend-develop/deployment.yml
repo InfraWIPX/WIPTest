@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: 10-frontend
+  labels:
+    app: 10-frontend
+    organizer: wipcamp10
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    app: 10-frontend
+    tier: frontend
+    organizer: wipcamp10
+  template:
+    metadata:
+      labels:
+        app: 10-frontend
+        tier: frontend
+        organizer: wipcamp10
+    spec:
+      containers:
+      - name: 10-frontend
+        image: registry.wip.camp/10-frontend
+        ports:
+        - containerPort: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-10-service
+  labels:
+    app: 10-frontend
+    tier: frontend
+    organizer: wipcamp10
+spec:
+  type: LoadBalancer
+  selector:
+    app: 10-frontend
+    tier: frontend
+    organizer: wipcamp10
+  ports:
+  - port: 80
+    targetPort: 3000
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: 10-frontend-ingress
+  labels:
+    app: 10-frontend
+    tier: frontend
+    organizer: wipcamp10
+spec:
+  rules:
+  - host: frontend.dev.10.wip.camp
+    http:
+      paths:
+      - backend:
+          serviceName: frontend-10-service
+          servicePort: 80
